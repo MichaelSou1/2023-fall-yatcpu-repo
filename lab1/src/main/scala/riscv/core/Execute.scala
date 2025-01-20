@@ -28,11 +28,6 @@ class Execute extends Module {
     val aluop1_source = Input(UInt(1.W))
     val aluop2_source = Input(UInt(1.W))
 
-    val alu_op = Input(UInt(Parameters.AluOpWidth))  
-    val pc = Input(UInt(Parameters.AddrWidth))
-    val funct3 = Input(UInt(3.W))
-    val funct7 = Input(UInt(7.W))
-
     val mem_alu_result = Output(UInt(Parameters.DataWidth))
     val if_jump_flag = Output(Bool())
     val if_jump_address = Output(UInt(Parameters.DataWidth))
@@ -52,17 +47,7 @@ class Execute extends Module {
   alu_ctrl.io.funct7 := funct7
 
   // lab1(Execute)
-  alu.io.func := alu_ctrl.io.alu_funct
-  alu.io.op1 := Mux(
-    io.aluop1_source === 1.U,
-    io.instruction_address,
-    io.reg1_data
-  )
-  alu.io.op2 := Mux(
-    io.aluop2_source === 1.U,
-    io.immediate,
-    io.reg2_data
-  )
+
 
 
 
