@@ -49,11 +49,11 @@ class CPU extends Module {
   id.io.instruction := inst_fetch.io.instruction
 
   // lab1(cpu)
-ex.io.immediate := id.io.immediate
-ex.io.alu_op := id.io.alu_op
-ex.io.pc := inst_fetch.io.instruction_address
-ex.io.funct3 := inst_fetch.io.instruction(14, 12)
-ex.io.funct7 := inst_fetch.io.instruction(31, 25)
+ex.io.immediate := id.io.ex_immediate
+  ex.io.alu_op := id.io.alu_op
+  ex.io.pc := inst_fetch.io.instruction_address
+  ex.io.funct3 := inst_fetch.io.instruction(14, 12)
+  ex.io.funct7 := inst_fetch.io.instruction(31, 25)
 
 
 

@@ -47,15 +47,17 @@ class Execute extends Module {
   alu_ctrl.io.funct7 := funct7
 
   // lab1(Execute)
-  val alu_op1 = Mux(io.aluop1_source === 0.U, io.reg1_data, io.instruction_address)
-  val alu_op2 = Mux(io.aluop2_source === 0.U, io.reg2_data, io.immediate)
-
-
-alu.io.op1 := alu_op1
-alu.io.op2 := alu_op2
-
-
-alu.io.alu_ctrl := alu_ctrl.io.alu_ctrl
+  alu.io.func := alu_ctrl.io.alu_funct
+  alu.io.op1 := Mux(
+    io.aluop1_source === 1.U,
+    io.instruction_address,
+    io.reg1_data
+  )
+  alu.io.op2 := Mux(
+    io.aluop2_source === 1.U,
+    io.immediate,
+    io.reg2_data
+  )
 
 
 
