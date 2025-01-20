@@ -28,6 +28,11 @@ class Execute extends Module {
     val aluop1_source = Input(UInt(1.W))
     val aluop2_source = Input(UInt(1.W))
 
+    val alu_op = Input(UInt(Parameters.AluOpWidth))  
+    val pc = Input(UInt(Parameters.AddrWidth))
+    val funct3 = Input(UInt(3.W))
+    val funct7 = Input(UInt(7.W))
+
     val mem_alu_result = Output(UInt(Parameters.DataWidth))
     val if_jump_flag = Output(Bool())
     val if_jump_address = Output(UInt(Parameters.DataWidth))
