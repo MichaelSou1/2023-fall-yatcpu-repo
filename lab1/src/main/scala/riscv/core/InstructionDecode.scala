@@ -178,7 +178,29 @@ class InstructionDecode extends Module {
   )
 
   // lab1(InstructionDecode)
+// ALU operand 2 source selection
+  io.ex_aluop2_source := Mux(
+    opcode === InstructionTypes.RM,
+    ALUOp2Source.Register, // R-type instructions use register as second operand
+    ALUOp2Source.Immediate // Other types use immediate as second operand
+  )
 
+  // Memory read enable for load instructions
+  io.memory_read_enable := opcode === InstructionTypes.L
+
+  // Memory write enable for store instructions
+  io.memory_write_enable := opcode === InstructionTypes.S
+
+  // Write back source selection
+  io.wb_reg_write_source := MuxLookup(
+    opcode,
+    RegWriteSource.ALUResult,
+    IndexedSeq(
+      InstructionTypes.L -> RegWriteSource.Memory, // Load instructions write from memory
+      Instructions.jal -> RegWriteSource.NextInstructionAddress, // JAL writes next instruction address
+      Instructions.jalr -> RegWriteSource.NextInstructionAddress // JALR writes next instruction address
+    )
+  )
 
 
 

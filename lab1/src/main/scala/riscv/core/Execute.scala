@@ -47,7 +47,22 @@ class Execute extends Module {
   alu_ctrl.io.funct7 := funct7
 
   // lab1(Execute)
+// Set ALU operand 1 based on aluop1_source
+alu.io.op1 := Mux(
+  io.aluop1_source === ALUOp1Source.Register,
+  io.reg1_data,
+  io.instruction_address
+)
 
+// Set ALU operand 2 based on aluop2_source 
+alu.io.op2 := Mux(
+  io.aluop2_source === ALUOp2Source.Register,
+  io.reg2_data,
+  io.immediate
+)
+
+// Connect ALU control signal
+alu.io.func := alu_ctrl.io.alu_funct
 
 
 
