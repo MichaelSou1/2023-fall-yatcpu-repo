@@ -18,15 +18,6 @@ import chisel3._
 import chisel3.util.{Cat, MuxLookup}
 import riscv.Parameters
 
-object InstructionsTypeI {
-  val CSRRW  = "b1110011".U(7.W) // CSR Read Write
-  val CSRRS  = "b1110011".U(7.W) // CSR Read Set
-  val CSRRC  = "b1110011".U(7.W) // CSR Read Clear
-  val CSRRWI = "b1110011".U(7.W) // CSR Read Write Immediate
-  val CSRRSI = "b1110011".U(7.W) // CSR Read Set Immediate
-  val CSRRCI = "b1110011".U(7.W) // CSR Read Clear Immediate
-}
-
 class Execute extends Module {
   val io = IO(new Bundle {
     val instruction = Input(UInt(Parameters.InstructionWidth))
@@ -81,15 +72,8 @@ class Execute extends Module {
     )
   io.if_jump_address := io.immediate + Mux(opcode === Instructions.jalr, io.reg1_data, io.instruction_address)
   io.mem_alu_result := alu.io.result
-
   // lab2(CLINTCSR)
-  // Handle CSR instructions
-  io.csr_reg_write_data := MuxLookup(funct3, 0.U, Seq(
-    InstructionsTypeI.CSRRW -> io.reg1_data,
-    InstructionsTypeI.CSRRS -> (io.csr_reg_read_data | io.reg1_data),
-    InstructionsTypeI.CSRRC -> (io.csr_reg_read_data & ~io.reg1_data),
-    InstructionsTypeI.CSRRWI -> io.immediate,
-    InstructionsTypeI.CSRRSI -> (io.csr_reg_read_data | io.immediate),
-    InstructionsTypeI.CSRRCI -> (io.csr_reg_read_data & ~io.immediate)
-  ))
+  /*
+  io.csr_reg_write_data :=
+  */
 }
