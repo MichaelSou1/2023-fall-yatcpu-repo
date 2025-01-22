@@ -32,34 +32,37 @@ class Timer extends Module {
   io.debug_limit := limit
   val enabled = RegInit(true.B)
   io.debug_enabled := enabled
-}
+
   //lab2(CLINTCSR)
-//finish the read-write for count,limit,enabled. And produce appropriate signal_interrupt
-when(io.bundle.write) {
-  when(io.bundle.address(3, 0) === 0x4.U) {
-    limit := io.bundle.write_data
-  }.elsewhen(io.bundle.address(3, 0) === 0x8.U) {
-    enabled := io.bundle.write_data =/= 0.U
+  //finish the read-write for count,limit,enabled. And produce appropriate signal_interrupt
+  when(io.bundle.valid && io.bundle.write_enable) {
+    when(io.bundle.address(3, 0) === 0x4.U) {
+      limit := io.bundle.write_data
+    }.elsewhen(io.bundle.address(3, 0) === 0x8.U) {
+      enabled := io.bundle.write_data =/= 0.U
+    }
   }
-}
 
-when(io.bundle.read) {
-  io.bundle.read_data := MuxLookup(io.bundle.address(3, 0), 0.U, IndexedSeq(
-    0x4.U -> limit,
-    0x8.U -> enabled.asUInt
-  ))
-}
-
-// Counter logic
-when(enabled) {
-  count := count + 1.U
-  when(count >= limit) {
-    count := 0.U
-    io.signal_interrupt := true.B
+  when(io.bundle.valid && !io.bundle.write_enable) {
+    io.bundle.read_data := MuxLookup(io.bundle.address(3, 0), 0.U, IndexedSeq(
+      0x4.U -> limit,
+      0x8.U -> enabled.asUInt
+    ))
   }.otherwise {
+    io.bundle.read_data := 0.U
+  }
+
+  // Counter logic
+  when(enabled) {
+    count := count + 1.U
+    when(count >= limit) {
+      count := 0.U
+      io.signal_interrupt := true.B
+    }.otherwise {
+      io.signal_interrupt := false.B
+    }
+  }.otherwise {
+    count := 0.U
     io.signal_interrupt := false.B
   }
-}.otherwise {
-  count := 0.U
-  io.signal_interrupt := false.B
 }
