@@ -84,7 +84,7 @@ class CLINT extends Module {
   when(io.interrupt_flag =/= InterruptStatus.None && interrupt_enable) {
     io.csr_bundle.mstatus_write_data := (io.csr_bundle.mstatus & ~(1.U(1.W) << 3)) | ((io.csr_bundle.mstatus(3) << 7).asUInt)
     io.csr_bundle.mepc_write_data := instruction_address
-    io.csr_bundle.mcause_write_data := Cat(1.U(1.W), 0.U(27.W), InterruptEntry.Timer0)
+    io.csr_bundle.mcause_write_data := (1.U << 31) | 7.U  
     io.csr_bundle.direct_write_enable := true.B
     io.interrupt_assert := true.B
     io.interrupt_handler_address := io.csr_bundle.mtvec
