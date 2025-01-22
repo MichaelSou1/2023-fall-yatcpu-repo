@@ -74,13 +74,13 @@ class Execute extends Module {
   io.mem_alu_result := alu.io.result
   // lab2(CLINTCSR)
   
-  io.csr_reg_write_data := MuxLookup(funct3, 0.U, IndexedSeq(
+io.csr_reg_write_data := MuxLookup(funct3, 0.U, IndexedSeq(
   InstructionsTypeCSR.csrrw -> io.reg1_data,
   InstructionsTypeCSR.csrrs -> (io.csr_reg_read_data | io.reg1_data),
   InstructionsTypeCSR.csrrc -> (io.csr_reg_read_data & (~io.reg1_data).asUInt),
-  InstructionsTypeCSR.csrrwi -> io.instruction(19, 15).zext,
-  InstructionsTypeCSR.csrrsi -> (io.csr_reg_read_data | io.instruction(19, 15).zext),
-  InstructionsTypeCSR.csrrci -> (io.csr_reg_read_data & (~io.instruction(19, 15).zext).asUInt)
+  InstructionsTypeCSR.csrrwi -> io.instruction(19, 15).asUInt,
+  InstructionsTypeCSR.csrrsi -> (io.csr_reg_read_data | io.instruction(19, 15).asUInt),
+  InstructionsTypeCSR.csrrci -> (io.csr_reg_read_data & (~io.instruction(19, 15).asUInt).asUInt)
 ))
   
 }
