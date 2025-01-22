@@ -81,15 +81,29 @@ class CLINT extends Module {
   )
 
   //lab2(CLINTCSR)
-  when(io.interrupt_flag =/= InterruptStatus.None && interrupt_enable) {
-    io.csr_bundle.mstatus_write_data := (io.csr_bundle.mstatus & ~(1.U(1.W) << 3)) | ((io.csr_bundle.mstatus(3) << 7).asUInt)
+  when(io.instruction === InstructionsEnv.ecall || io.instruction === InstructionsEnv.ebreak) {
+    io.csr_bundle.mstatus_write_data := io.csr_bundle.mstatus(31, 4) ## 0.U(1.W) ## io.csr_bundle.mstatus(2, 0)
     io.csr_bundle.mepc_write_data := instruction_address
-    io.csr_bundle.mcause_write_data := (1.U << 31) | 7.U  
+    io.csr_bundle.mcause_write_data := MuxLookup(
+      io.instruction,
+      10.U,
+      IndexedSeq(
+        InstructionsEnv.ecall -> 11.U,
+        InstructionsEnv.ebreak -> 3.U,
+      )
+    )
+    io.csr_bundle.direct_write_enable := true.B
+    io.interrupt_assert := true.B
+    io.interrupt_handler_address := io.csr_bundle.mtvec
+  }.elsewhen(io.interrupt_flag =/= InterruptStatus.None && interrupt_enable) {
+    io.csr_bundle.mstatus_write_data := io.csr_bundle.mstatus(31, 4) ## 0.U(1.W) ## io.csr_bundle.mstatus(2, 0)
+    io.csr_bundle.mepc_write_data := instruction_address
+    io.csr_bundle.mcause_write_data := Mux(io.interrupt_flag(0), 0x80000007L.U, 0x8000000BL.U)
     io.csr_bundle.direct_write_enable := true.B
     io.interrupt_assert := true.B
     io.interrupt_handler_address := io.csr_bundle.mtvec
   }.elsewhen(io.instruction === InstructionsRet.mret) {
-    io.csr_bundle.mstatus_write_data := (io.csr_bundle.mstatus & ~(1.U(1.W) << 3)) | ((io.csr_bundle.mstatus(7) << 3).asUInt)
+    io.csr_bundle.mstatus_write_data := io.csr_bundle.mstatus(31, 4) ## io.csr_bundle.mstatus(7) ## io.csr_bundle.mstatus(2, 0)
     io.csr_bundle.mepc_write_data := io.csr_bundle.mepc
     io.csr_bundle.mcause_write_data := io.csr_bundle.mcause
     io.csr_bundle.direct_write_enable := true.B
